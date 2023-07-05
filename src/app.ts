@@ -22,7 +22,6 @@ export class App {
     this.app = express();
     this.env = NODE_ENV || 'development';
     this.port = PORT || 3000;
-
     this.connectToDatabase();
     this.initializeMiddlewares();
     this.initializeRoutes(routes);
@@ -46,8 +45,12 @@ export class App {
     if (this.env !== 'production') {
       set('debug', true);
     }
-
-    await connect(dbConnection.url);
+    try {
+      await connect(dbConnection.url);
+      console.log('Connected');
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   private initializeMiddlewares() {
