@@ -3,7 +3,7 @@ import { Task } from '@/typings/task';
 
 const TaskSchema: Schema = new Schema({
   taskId: {
-    type: String,
+    type: Number,
     required: true,
     unique: true,
   },
@@ -16,17 +16,22 @@ const TaskSchema: Schema = new Schema({
     required: true,
   },
   startDate: {
-    type: String,
+    type: Date,
     required: true,
   },
   completionDate: {
-    type: String,
+    type: Date,
     required: true,
   },
   status: {
     type: String,
+    enum : ['Created','Started','Completed'],
+    default: 'Created',
     required: true,
   },
-});
+}
+, { timestamps: true }
+);
+
 
 export const TaskModel = model<Task & Document>('Task', TaskSchema);

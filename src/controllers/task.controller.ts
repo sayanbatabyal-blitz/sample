@@ -1,38 +1,88 @@
 import { NextFunction, Request, Response } from 'express';
-import { Task } from '@/typings/task';
+import { PagedTask, Task } from '@/typings/task';
 import { TaskService } from '@/services/task.service';
-import { Status } from '@/typings/common';
+import { CreateTaskRequestBody, GetTaskRequestParam, PageTasksRequestQuery, UpdateTaskRequestBody, UpdateTaskRequestParam, UpdateTaskStatusRequestBody, UpdateTaskStatusRequestParam } from './typings/task.controller';
 
 export class TaskController {
   public taskService = new TaskService();
+ 
+  public getTask = async (req:Request , res:Response, next:NextFunction)=>{
+    try {
+      const requestParam: GetTaskRequestParam=req.params
+      const taskId: number=Number(requestParam.id)
+      if(isNaN(taskId)) throw new Error("Invalid TaskID")
+      const task:Task[] = await this.taskService.getTask(taskId)
+      res.status(201).json(task);
+    }
+    catch(error){
+      next(error);
+    }
+  };
+
+  public getAllTasks = async (req:Request , res:Response, next:NextFunction)=>{
+    try {
+      const tasks:Task[] = await this.taskService.getAllTasks()
+      res.status(201).json(tasks);
+    }
+    catch(error){
+      next(error);
+    }
+  };
 
   public createTask = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const taskData = req.body;
-      const createTaskData: Task = await this.taskService.createTask({ ...taskData, status: 'created' });
-      res.status(201).json({ data: createTaskData, message: 'created' });
+      const requestBody:CreateTaskRequestBody=req.body;
+      const taskData = requestBody;
+      await this.taskService.createTask(taskData);
+      res.status(201).json({status:"success"});
     } catch (error) {
       next(error);
     }
   };
   public updateTask = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const taskId = req.params.id;
-      const taskChanges = req.body;
-      const updatedTaskData: Task = await this.taskService.updateTask(taskId, taskChanges);
-      res.status(201).json({ data: updatedTaskData, message: 'updated' });
+      const requestBody:UpdateTaskRequestBody=req.body;
+      const requestParam:UpdateTaskRequestParam=req.params;
+      const taskId:number = Number(requestParam.id);
+      if(isNaN(taskId)) throw new Error("Invalid TaskID")
+      const taskData=requestBody
+      const isValid=await this.taskService.getTask(taskId);
+      if(isValid.length===0) res.status(404).json({status:"error" ,messsage:"Task Not Found"})
+      await this.taskService.updateTask(taskId, taskData);
+      res.status(201).json({status:"success"});
     } catch (error) {
       next(error);
     }
   };
   public updateTaskStatus = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const taskId = req.params.id;
-      const status: Status = req.body.status;
-      const updatedTaskData: Task = await this.taskService.updateTaskStatus(taskId, status);
-      res.status(201).json({ data: updatedTaskData, message: 'Task Status updated' });
+      const requestParam:UpdateTaskStatusRequestParam=req.params
+      const requestBody:UpdateTaskStatusRequestBody=req.body
+      const taskId=parseInt(requestParam.id)
+      if(isNaN(taskId)) throw new Error("Invalid TaskID")
+      const isValid=await this.taskService.getTask(taskId);
+      if(isValid.length===0) res.status(404).json({status:"error" ,messsage:"Task Not Found"})
+      await this.taskService.updateTaskStatus(taskId, requestBody.status);
+      res.status(201).json({status:"success"});
     } catch (error) {
       next(error);
     }
   };
+  
+  public pageTasks = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const requestQuery:PageTasksRequestQuery=req.query
+      const page_no=parseInt(requestQuery.page_no)
+      const page_size=parseInt(requestQuery.page_size)
+      if(isNaN(page_no)) throw new Error("Invalid pageNo")
+      if(isNaN(page_size)) throw new Error("Invalid pageSize")
+      const data:PagedTask=await this.taskService.pageTasks(page_size,page_no);
+      res.status(201).json(data);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+
+
 }

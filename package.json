@@ -35,7 +35,8 @@
     "swagger-ui-express": "^4.5.0",
     "typedi": "^0.10.0",
     "winston": "^3.8.1",
-    "winston-daily-rotate-file": "^4.7.1"
+    "winston-daily-rotate-file": "^4.7.1",
+    "zod": "^3.21.4"
   },
   "devDependencies": {
     "@swc/cli": "^0.1.57",
