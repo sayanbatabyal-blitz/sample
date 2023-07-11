@@ -20,6 +20,5 @@ export class TaskRoute {
     this.router.post(`${this.path}`,this.validate.validateRequestBody(taskControllerValidators.createTaskRequestBodyParser), this.taskController.createTask);
     this.router.put(`${this.path}/status/:id`,this.validate.validateRequestParams(taskControllerValidators.updateTaskStatusRequestParamParser),this.validate.validateRequestBody(taskControllerValidators.updateTaskStatusRequestBodyParser), this.taskController.updateTaskStatus);
     this.router.put(`${this.path}/:id`,this.validate.validateRequestParams(taskControllerValidators.updateTaskRequestParamParser),this.validate.validateRequestBody(taskControllerValidators.updateTaskRequestBodyParser), this.taskController.updateTask);
-    
   }
 }
