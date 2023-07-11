@@ -41,7 +41,7 @@ class RedisClient {
     }
 
     /**
-     * dekete a particular key from redis server 
+     * delete a particular key from redis server 
      * @param key 
      */
     public async delete(key: string) {
