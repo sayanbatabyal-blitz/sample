@@ -15,17 +15,29 @@ export class TaskService {
    * @param taskData 
    */
   public createTask = async (taskData: ITaskOptions): Promise<void> => {
-    await this.taskDao.createTask(taskData);
+    try {
+
+      await this.taskDao.createTask(taskData);
+    }
+    catch (err) {
+      throw err
+    }
   }
-  
+
   /**
    * for updating a task
    * @param id 
    * @param taskData 
    */
   public updateTask = async (id: number, taskData: ITaskOptions): Promise<void> => {
-    await Promise.all([this.taskDao.updateTask(id, taskData),
-                       this.redis.delete(`task:${id}`)])
+    try {
+
+      await Promise.all([this.taskDao.updateTask(id, taskData),
+      this.redis.delete(`task:${id}`)])
+    }
+    catch (err) {
+      throw err
+    }
 
   }
   /**
@@ -34,8 +46,14 @@ export class TaskService {
    * @param status taskStatus
    */
   public updateTaskStatus = async (id: number, status: Status): Promise<void> => {
-    await Promise.all([this.taskDao.updateTaskStatus(id, status),
-                       this.redis.delete(`task:${id}`)])
+    try {
+
+      await Promise.all([this.taskDao.updateTaskStatus(id, status),
+      this.redis.delete(`task:${id}`)])
+    }
+    catch (err) {
+      throw err
+    }
   }
 
   /**
@@ -43,8 +61,14 @@ export class TaskService {
    * @returns all the tasks
    */
   public getAllTasks = async (): Promise<Task[]> => {
-    const allTasks: Task[] = await this.taskDao.getAllTasks();
-    return allTasks;
+    try {
+
+      const allTasks: Task[] = await this.taskDao.getAllTasks();
+      return allTasks;
+    }
+    catch (err) {
+      throw err
+    }
   }
 
   /**
@@ -54,9 +78,16 @@ export class TaskService {
    * @returns a single task by taskId
    */
   public getTask = async (id: number): Promise<Task[]> => {
-    const task: Task[] = await this.taskDao.getTask(id);
-    await this.redis.set(`task:${id}`, JSON.stringify(task))
-    return task;
+    try {
+
+      const task: Task[] = await this.taskDao.getTask(id);
+      if (task.length === 0) throw new Error('TaskId Invalid')
+      await this.redis.set(`task:${id}`, JSON.stringify(task))
+      return task;
+    }
+    catch (err) {
+      throw err
+    }
   }
 
   /**
@@ -66,13 +97,18 @@ export class TaskService {
    * @returns 
    */
   public pageTasks = async (page_size: number, page_no: number): Promise<PagedTask> => {
-    const res = await Promise.all([await this.taskDao.pageTask(page_size, page_no), await this.taskDao.count()])
-    return {
-      tasks: res[0], meta: {
-        page_size: `${page_size}`,
-        page_no: `${page_no}`,
-        total: `${res[1]}`
+    try {
+      const res = await Promise.all([await this.taskDao.pageTask(page_size, page_no), await this.taskDao.count()])
+      return {
+        tasks: res[0], meta: {
+          page_size: `${page_size}`,
+          page_no: `${page_no}`,
+          total: `${res[1]}`
+        }
       }
+    }
+    catch (err) {
+      throw err
     }
   }
 
