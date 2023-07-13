@@ -29,10 +29,6 @@ export const createTaskRequestBodyParser = z.object({
         required_error: 'StartDate is required',
         invalid_type_error: 'Start Date is not a valid Date'
     }),
-    completionDate:z.string({
-        required_error: 'Completion Date is required',
-        invalid_type_error: 'Completion Date is not a valid Date'
-    })
 }) 
 
 export const updateTaskRequestParamParser = z.object({

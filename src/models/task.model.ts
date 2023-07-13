@@ -21,7 +21,6 @@ const TaskSchema: Schema = new Schema({
   },
   completionDate: {
     type: Date,
-    required: true,
   },
   status: {
     type: String,

@@ -1,10 +1,26 @@
 import { NextFunction, Request, Response } from 'express';
-import { PagedTask, Task } from '@/typings/task';
+import { ITaskOptions, PagedTask, Task } from '@/typings/task';
 import { TaskService } from '@/services/task.service';
 import { CreateTaskRequestBody, GetTaskRequestParam, PageTasksRequestQuery, UpdateTaskRequestBody, UpdateTaskRequestParam, UpdateTaskStatusRequestBody, UpdateTaskStatusRequestParam } from './typings/task.controller';
-
+import CSVJsonClient from '@/csvtojson/csvtojson.config';
+import csv from "csvtojson"
 export class TaskController {
   public taskService = new TaskService();
+  
+  public bulkUpload = async (req: Request, res: Response, next: NextFunction) => {
+     try{
+         const path=req.file.path
+         const csvtojson=new CSVJsonClient()
+         const tasks:ITaskOptions[]=await csvtojson.getJson(path)
+         this.taskService.bulkUpload(tasks)
+         return res.status(201).json({status:'success'})
+     }
+     catch(err){
+      return res.status(500).json({status:'failure',error:err.problem})
+     }
+     
+  }
+
 
   public getTask = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -20,7 +36,7 @@ export class TaskController {
   };
 
   /***
-   * 
+   * get all tasks
    */
   public getAllTasks = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -37,8 +53,8 @@ export class TaskController {
       const requestBody: CreateTaskRequestBody = req.body;
       const taskData = requestBody;
       const taskExist = await this.taskService.getTask(parseInt(taskData.taskId))
-      if (taskExist.length == 1)
-        return res.status(500).json({ statis: 'failure', error: 'taskId exists' })
+      if (taskExist.length!==0)
+        return res.status(500).json({ status: 'failure', error: 'taskId exists' })
       await this.taskService.createTask(taskData);
       res.status(201).json({ status: "success" });
     } catch (error) {
