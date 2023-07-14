@@ -1,10 +1,12 @@
 import { TaskModel } from '@/models/task.model';
-import { Status } from '@/typings/common';
+import { Daterange, Status } from '@/typings/common';
 import { ITaskOptions, Task} from '@/typings/task';
 class TaskDao {
   public createTask = async (taskData: ITaskOptions) => {
      await TaskModel.create(taskData);
   };
+
+  
   public updateTask = async (id: number, taskData: ITaskOptions) => {
      await TaskModel.findOneAndUpdate({taskId:id},{$set: taskData }, { runValidators: true });
   };
@@ -17,6 +19,43 @@ class TaskDao {
   public getTask = async (id: number) => {
     return await TaskModel.find({taskId:id});
   };
+
+  public getByFilters = async (filters:Object) => {
+    return await TaskModel.find(filters);
+  };
+
+  public getByStatus = async(status:Status[])=>{
+    return await TaskModel.find({status:{$in:status}})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  }
+
   public getAllTasks = async () => {
     return await TaskModel.find();
   };

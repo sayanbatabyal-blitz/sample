@@ -3,10 +3,23 @@ import { ITaskOptions, PagedTask, Task } from '@/typings/task';
 import { TaskService } from '@/services/task.service';
 import { CreateTaskRequestBody, GetTaskRequestParam, PageTasksRequestQuery, UpdateTaskRequestBody, UpdateTaskRequestParam, UpdateTaskStatusRequestBody, UpdateTaskStatusRequestParam } from './typings/task.controller';
 import CSVJsonClient from '@/csvtojson/csvtojson.config';
-import csv from "csvtojson"
 export class TaskController {
   public taskService = new TaskService();
   
+  public bulkDownload =async (req: Request, res: Response, next: NextFunction) =>{
+    try{
+       const filters=req.body
+       const csv = await this.taskService.bulkDownload(filters)
+       res.setHeader('Content-disposition', 'attachment; filename=testing.csv');
+       res.set('Content-Type', 'text/csv');
+       return res.status(201).send(csv)
+    }
+    catch(err){
+      next(err)
+    }
+  }
+
+
   public bulkUpload = async (req: Request, res: Response, next: NextFunction) => {
      try{
          const path=req.file.path

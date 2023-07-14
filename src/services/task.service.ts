@@ -1,10 +1,12 @@
 import { ITaskOptions, PagedTask, Task } from '@/typings/task';
 import TaskDao from '@/dao/task.dao';
-import { Status } from '@/typings/common';
+import { IFilter, Status } from '@/typings/common';
 import RedisClient from '@/redis/redis.client';
 import Queue from 'bull'
 import ValidateTask from '@/utils/task.validator';
 import { HandledError } from '@/exceptions/HandledExceptions';
+import { createFilter } from '@/utils/filters';
+import { createCsvFile } from '@/utils/createCsv';
 export class TaskService {
   public taskDao = new TaskDao();
   public redis = new RedisClient()
@@ -16,19 +18,29 @@ export class TaskService {
    * @param taskData 
    */
 
+  public bulkDownload = async (filter: IFilter) => {
+    const dbFilter = createFilter(filter)
+    const filteredTasks: Task[] = await this.taskDao.getByFilters(dbFilter)
+    const csv = await createCsvFile(filteredTasks, [{ label: 'Task Id', value: 'taskId' },
+    { label: 'Task Description', value: 'description' }, { label: 'Task Name', value: 'name' }, { label: 'Start Date', value: 'startDate' }, { label: 'Completion Date', value: 'completionDate' }, { label: 'Status', value: 'status' },
+    ])
+    return csv
+  }
+
+
   public bulkUpload = (tasks: ITaskOptions[]): void => {
     try {
       tasks.map((task: ITaskOptions, rowNo: number) => {
         const taskValidator = new ValidateTask(task)
         taskValidator.verifyFields(rowNo)
-        if (taskValidator.errorMsg.length != 0)     
-        throw new HandledError('CSV-VErificationError',taskValidator.errorMsg)
+        if (taskValidator.errorMsg.length != 0)
+          throw new HandledError('CSV-VErificationError', taskValidator.errorMsg)
       })
-      const taskQueue = new Queue('taskCreate', {redis: {host: "localhost", port: 6379 }})
-      tasks.map((task) =>{
-        if(task.completionDate.length===0) delete task.completionDate
-        if(task.status.length===0) delete task.status
-        taskQueue.add('create',task)
+      const taskQueue = new Queue('taskCreate', { redis: { host: "localhost", port: 6379 } })
+      tasks.map((task) => {
+        if (task.completionDate.length === 0) delete task.completionDate
+        if (task.status.length === 0) delete task.status
+        taskQueue.add('create', task)
       })
     }
     catch (err) {

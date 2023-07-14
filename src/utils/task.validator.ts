@@ -28,12 +28,12 @@ class  ValidateTask{
     }
 
     public verifyFields=(rowNo:number):void=>{
-        if(isNaN(this.taskId)) this.errorMsg=`TaskId not a number at Row:${rowNo}`
-        else if(this.name=='') this.errorMsg=`Name is missing at Row:${rowNo}`
-        else if(this.description=='') this.errorMsg=`Description is missing at Row:${rowNo}`
-        else if(this.startDate.length!==10 || isNaN(Date.parse(this.startDate)) ) this.errorMsg=`Start Date is Invalid at Row: ${rowNo}`
-        else if(this.completionDate.length!==0 && this.completionDate.length!==10 || isNaN(Date.parse(this.startDate)) ) this.errorMsg=`Completion Date is Invalid at Row: ${rowNo}`
-        else if(this.status.length!==0 && this.status!==statusEnum.Completed && this.status!==statusEnum.Started && this.status!==statusEnum.Created )  this.errorMsg=`Status is of Invalid Type at Row: ${rowNo}`
+        if(isNaN(this.taskId)) this.errorMsg=`TaskId not a number at Row:${rowNo+2}`
+        else if(this.name=='') this.errorMsg=`Name is missing at Row:${rowNo+2}`
+        else if(this.description=='') this.errorMsg=`Description is missing at Row:${rowNo+2}`
+        else if(this.startDate.length!==10 || isNaN(Date.parse(this.startDate)) ) this.errorMsg=`Start Date is Invalid at Row: ${rowNo+2}`
+        else if(this.completionDate.length!==0 && this.completionDate.length!==10 || isNaN(Date.parse(this.startDate)) ) this.errorMsg=`Completion Date is Invalid at Row: ${rowNo+2}`
+        else if(this.status.length!==0 && this.status!==statusEnum.Completed && this.status!==statusEnum.Started && this.status!==statusEnum.Created )  this.errorMsg=`Status is of Invalid Type at Row: ${rowNo+2}`
         else this.errorMsg=''
     }
 }

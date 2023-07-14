@@ -17,6 +17,7 @@ export class TaskRoute {
   }
 
   private initializeRoutes() {
+    this.router.post(`${this.path}/bulkDownload`,this.taskController.bulkDownload)
     this.router.get(`${this.path}`,this.taskController.getAllTasks)
     this.router.get(`${this.path}/page/`,this.validate.validateRequestQuery(taskControllerValidators.pageTasksRequestQueryParser),this.taskController.pageTasks)
     this.router.get(`${this.path}/:id`,this.validate.validateRequestParams(taskControllerValidators.getTaskRequestParamParser),this.redis.getData, this.taskController.getTask)
